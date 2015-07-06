@@ -1,0 +1,653 @@
+<meta charset="UTF-8">
+<html>
+	<head>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+		<link rel="stylesheet" type="text/css" href="css/ion.tabs.css" />
+		<link rel="stylesheet" type="text/css" href="css/ion.tabs.skinBordered.css" />
+		<link rel="stylesheet" type="text/css" href="css/circle-styles.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery.nouislider.css">
+		<link rel="stylesheet" type="text/css" href="css/jquery.nouislider.pips.css">
+		<link rel="stylesheet" type="text/css" href="css/jquery.mCustomScrollbar.css" />
+		<link rel="stylesheet" href="font-awesome-4.3.0/css/font-awesome.min.css">
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<script src="js/ion.tabs.min.js"></script>
+		<script src="js/raphael.2.1.0.min.js"></script>
+		<script src="js/justgage.1.0.1.min.js"></script>
+		<script src="js/circle-progress.js"></script>
+		<script src="js/jquery.nouislider.all.js"></script>
+		<script src="js/jquery.liblink.js"></script>
+		<script src="js/jquery.mCustomScrollbar.concat.min.js"></script>		
+		
+		<script type="text/javascript">
+			var timer;
+			var gauge;
+			
+			$( document ).ready(function() {				
+				$.ionTabs("#tabs_1", {
+					type: "none",
+					onChange: function(obj){
+						console.log(obj);
+					}
+				});
+			});
+
+			window.onload = function(){
+
+				//save the default description text
+				var default_desc = $("#description").find("p").html();
+				
+				//main gauge
+				gauge = new JustGage({
+					id: "score_gauge",
+					value: '',
+					min: 0,
+					max: 100,
+					title: " ",
+					label: "Score",
+					shadowOpacity: 1,
+					levelColorsGradient: true,
+					gaugeColor: "#eee",
+					levelColors: ["#ff0000", "#ffff00", "#00d200"],
+					startAnimationTime: 0,
+					startAnimationType: "bounce"              
+				});
+				
+				
+				//Small circle 1
+				$('.circle.first').circleProgress({
+					value: 0,
+					animation: {duration: 1000},
+					size: 33,
+					startAngle: -Math.PI/2,
+					thickness: 4,
+					fill: { gradient: ['#2B60DE', '#2B60DE'] }
+				}).on('circle-animation-progress', function(event, progress, stepValue) {
+					$(this).find('strong').text(String(stepValue.toFixed(2)).substr(2));
+				});
+				
+				
+				//Small circle 2
+				$('.circle.second').circleProgress({
+					value: 0,
+					animation: {duration: 1000},
+					size: 33,
+					thickness: 4,
+					startAngle: -Math.PI/2,
+					fill: { gradient: ['#2B60DE', '#2B60DE'] }
+				}).on('circle-animation-progress', function(event, progress, stepValue) {
+					$(this).find('strong').text(String(stepValue.toFixed(2)).substr(2));
+				});
+				
+				
+				//Small circle 3
+				$('.circle.third').circleProgress({
+					value: 0,
+					animation: {duration: 1000},
+					size: 33,
+					thickness: 4,
+					startAngle: -Math.PI/2,
+					fill: { gradient: ['#2B60DE', '#2B60DE'] }
+				}).on('circle-animation-progress', function(event, progress, stepValue) {
+					$(this).find('strong').text(String(stepValue.toFixed(2)).substr(2));
+				});
+
+				
+				//range slider initialize
+				$("#slider").noUiSlider({
+					range: {
+						min: 0,
+						max: 100
+					},
+					step: 5,
+					connect: "lower",
+					start: 50
+				});
+				
+				
+				//range slider markers
+				$("#slider").noUiSlider_pips({
+					mode: 'positions',
+					values: [0,25,50,75,100],
+					density:5
+				});				
+				
+				
+				//range slider tooltip
+				$("#slider").Link('lower').to('-inline-<div class="tooltip" style="display:none;"></div>', function (value) {
+					$(this).html(
+						'<span>' + Math.round(value) + '%</span>'
+					);
+				});
+		
+				
+				//range slider tooltip animations
+				$(".noUi-handle").on({
+					"mouseover": function() {
+						clearTimeout(timer);
+						timer = setTimeout(function() {
+							$(".tooltip").fadeIn();
+						}, 200);
+					}, "mouseout": function() {
+						clearTimeout(timer);
+						timer = setTimeout(function() {
+							$(".tooltip").fadeOut();
+						}, 800);
+					}
+				});
+				
+				$("#slider").on('slide change set', function() {
+					if($(this).val() <= 20) {
+						$(".noUi-target.noUi-connect").css({
+							background: "#FAFAFA",
+							"box-shadow": "none"
+						});
+						$(".noUi-background").css({
+							background: "red",
+							transition: "all 450ms",
+							"box-shadow": "inset 0 0 3px rgba(51,51,51,0.45)"
+						});
+					} else if ($(this).val() <= 40){
+						$(".noUi-target.noUi-connect").css({
+							background: "#FAFAFA",
+							"box-shadow": "none"
+						});
+						$(".noUi-background").css({
+							background: "orange",
+							transition: "all 450ms",
+							"box-shadow": "inset 0 0 3px rgba(51,51,51,0.45)"
+						});
+					} else if ($(this).val() <= 60){
+						if($(this).val() < 50) {
+							$(".noUi-target.noUi-connect").css({
+							background: "#FAFAFA",
+							"box-shadow": "none"
+						});
+						$(".noUi-background").css({
+							background: "#EBEB00",
+							transition: "all 450ms",
+							"box-shadow": "inset 0 0 3px rgba(51,51,51,0.45)"
+						});
+						} else {
+							$(".noUi-target.noUi-connect").css({
+							background: "#EBEB00",
+							"box-shadow": "inset 0 0 3px rgba(51,51,51,0.45)"
+						});
+						$(".noUi-background").css({
+							background: "#FAFAFA",
+							transition: "all 450ms",
+							"box-shadow": "none"
+						});
+						}
+					} else if ($(this).val() <= 80){
+						$(".noUi-target.noUi-connect").css({
+							background: "#A7F10D",
+							"box-shadow": "inset 0 0 3px rgba(51,51,51,0.45)"
+						});
+						$(".noUi-background").css({
+							background: "#FAFAFA",
+							transition: "all 450ms",
+							"box-shadow": "none"
+						});
+					} else {
+						$(".noUi-target.noUi-connect").css({
+							background: "#1EE11E",
+							"box-shadow": "inset 0 0 3px rgba(51,51,51,0.45)"
+						});
+						$(".noUi-background").css({
+							background: "#FAFAFA",
+							transition: "all 450ms",
+							"box-shadow": "none"
+						});
+					}
+				});
+				
+				
+				//hide comment area and buttons
+				$("#comment-div").hide();
+				$("#save-comment-btn").hide();
+				$("#cancel-comment-btn").hide();
+				$("#category-2").hide();
+				
+				
+				//hide checkboxes and show comment-area
+				$("#comment-btn").click(function() {
+					$(".checkbox-div").hide();
+					$("#submit-rating-btn").hide();
+					$("#save-comment-btn").show();
+					$("#cancel-comment-btn").show();
+					$(this).hide();
+					$("#comment-div").show();
+					$("#comment-textarea").focus();		
+				});
+
+				
+				//hide comment-area and delete comment-text
+				$("#cancel-comment-btn").click(function() {
+					$("#comment-textarea").val("");
+					$("#comment-btn").html("<i class='fa fa-comment-o'></i> Comment");
+					close_comments();
+				});
+				
+				
+				//hide comment-area and save comment-text
+				$("#save-comment-btn").click(function() {
+					if ($("#comment-textarea").val() != "") {
+						$("#comment-btn").html("<i class='fa fa-pencil'></i> Edit Comment");
+					}
+					close_comments();
+				});
+				
+				//Show description on mouseover
+				$("#score_gauge").find("tspan").on({
+					"mouseover": function() {
+						$("#description").find("p").html("Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.");
+					}, "mouseout": function() {
+						$("#description").find("p").html(default_desc);
+					}
+				});
+				
+				//Show description on mouseover
+				$(".first.circle").on({
+					"mouseover": function() {
+						default_desc = $("#description").find("p").html();
+						$("#description").find("p").html("Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.");
+					}, "mouseout": function() {
+						$("#description").find("p").html(default_desc);
+					}
+				});
+				
+				
+				//Show description on mouseover
+				$(".second.circle").on({
+					"mouseover": function() {
+						default_desc = $("#description").find("p").html();
+						$("#description").find("p").html("Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem.");
+					}, "mouseout": function() {
+						$("#description").find("p").html(default_desc);
+					}
+				});
+				
+				
+				//Show description on mouseover
+				$(".third.circle").on({
+					"mouseover": function() {
+						default_desc = $("#description").find("p").html();
+						$("#description").find("p").html("Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.");
+					}, "mouseout": function() {
+						$("#description").find("p").html(default_desc);
+					}
+				});
+				
+				var check = function() {
+					if ($("#temp").val() != '') {
+						ajaxInit();
+					} else {
+						setTimeout(check, 50);
+					}
+				}
+				
+				check();
+				
+				//var t = $("#temp").delay(3000).val();
+				//window.setTimeout(ajaxAsyncInitRequest('http://localhost:8080/ajaxdemo/get-current-time', t), 5000);
+				//ajaxAsyncInitRequest('http://localhost:8080/ajaxdemo/get-current-time', t);
+			};
+
+			function ajaxInit() {
+				var t = $("#temp").val();
+				ajaxAsyncInitRequest('http://localhost:8080/ajaxdemo/get-current-time', t);
+			}
+
+			//checkboxes <-> comments toggle function
+			function close_comments() {
+				$("#save-comment-btn").show();
+				$("#cancel-comment-btn").hide();
+				$("#save-comment-btn").hide();
+				$("#comment-div").hide();
+				$(".checkbox-div").show();
+				$("#submit-rating-btn").show();
+				$("#comment-btn").show();
+			}
+			
+			function toggle_checkbox(chk) {
+				if (chk.val() == "None") {
+					chk.val("Set");
+				} else if (chk.val() == "Set") {
+					chk.val("None");
+				}
+			}
+		
+			function ajaxAsyncPostRequest(reqURL, temp)
+			{
+				$("#gauge_error").hide();
+				$(".gauge").show();
+				$("#spinner").show();
+				gauge.refresh("");
+			
+				temp = encodeURIComponent(temp);
+				var params = "request=1&site=" + temp + "&pluginid=" + $("#pluginid").val() + "&userrating=" + $("#slider").val() + "&usercomment=" + $("#comment-textarea").val()
+				+ "&chkbox1=" + $("#sq_checkbox1").val() + "&chkbox2=" + $("#sq_checkbox2").val()
+				+ "&chkbox3=" + $("#sq_checkbox3").val() + "&chkbox4=" + $("#sq_checkbox4").val()
+				+ "&chkbox5=" + $("#sq_checkbox5").val() + "&chkbox6=" + $("#sq_checkbox6").val()
+				+ "&chkbox7=" + $("#sq_checkbox7").val() + "&chkbox8=" + $("#sq_checkbox8").val();
+				
+				//Creating a new XMLHttpRequest object
+				var xmlhttp;
+				if (window.XMLHttpRequest){
+					xmlhttp = new XMLHttpRequest(); //for IE7+, Firefox, Chrome, Opera, Safari
+				}
+				
+				//Create a asynchronous GET request
+				xmlhttp.open("POST", reqURL, true);
+				
+				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				
+				//When readyState is 4 then get the server output
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4) { 
+						if (xmlhttp.status == 200) 
+						{
+							$("#msg-tooltip").removeClass("alert-info");
+							$("#msg-tooltip").removeClass("alert-danger");
+							$("#msg-tooltip").addClass("alert-success");
+							$("#msg-tooltip").html(" Rating submitted successfully!");
+							$("#msg-tooltip").fadeIn(800, function() {
+								setTimeout(function() {
+									$("#msg-tooltip").fadeOut(800);
+								}, 3000);
+							});				
+							$("#spinner").hide();
+							var obj = $.parseJSON(xmlhttp.responseText);
+							gauge.refresh(obj[0]);
+							setTimeout(function() {
+								$('.circle.first').circleProgress({ value: obj[1]/100 });
+							}, 100);
+							setTimeout(function() {
+								$('.circle.second').circleProgress({ value: obj[2]/100 });
+							}, 200);
+							setTimeout(function() {
+								$('.circle.third').circleProgress({ value: obj[3]/100 });
+							}, 300);
+							$("#classifications").html(obj[14]);
+							
+							$("#user_comments").mCustomScrollbar("destroy");
+							$("#user_comments").empty();
+							for (var i=1; i<11; i++) {
+								var temp = ("comment_text_" + i)
+								if (temp in obj) {
+									$("#user_comments").append('<div class="comment" id="' + i + '"></div>');
+									$("#" + i + ".comment").append('<div class="comment_text"></div>');
+									$("#" + i + ".comment").append('<div class="comment_wrapper">');
+									var cmt = $("#" + i + ".comment").find(".comment_wrapper");
+									$("#" + i + ".comment").find(".comment_text").html(obj["comment_text_" + i]);									
+									cmt.append('<div class="comment_author"></div>');
+									cmt.append('<div class="comment_date"></div>');
+									cmt.find(".comment_author").html("Anonymous, ");
+									cmt.find(".comment_date").html(obj["comment_date_" + i]);
+								}
+							}
+							$("#user_comments").mCustomScrollbar({
+								theme: "dark-2",
+								setLeft: 0
+							});	
+						} else {
+							$("#msg-tooltip").removeClass("alert-info");
+							$("#msg-tooltip").addClass("alert-danger");
+							$("#msg-tooltip").html(" Could not submit rating!");
+							$("#msg-tooltip").fadeIn(800, function() {
+								setTimeout(function() {
+									$("#msg-tooltip").fadeOut(800);
+								}, 3000);
+							});				
+							$(".gauge").hide();
+							$("#spinner").hide();
+							$("#gauge_error").show();
+							$(".circle.first").find('strong').text("--");
+							$(".circle.second").find('strong').text("--");
+							$(".circle.third").find('strong').text("--");
+							$("#description").html("<p>Unable to connect to the Aegis server. This may be a problem with the server or you might not be connected to the internet.</p>");
+							$("#classifications").html("");
+						}
+					}
+				};
+				xmlhttp.send(params);
+			}
+			
+			function ajaxAsyncInitRequest(reqURL, temp)
+			{
+				temp = encodeURIComponent(temp);
+				var params = "request=0&site=" + temp + "&pluginid=" + $("#pluginid").val();
+				
+				//Creating a new XMLHttpRequest object
+				var xmlhttp;
+				if (window.XMLHttpRequest){
+					xmlhttp = new XMLHttpRequest(); //for IE7+, Firefox, Chrome, Opera, Safari
+				}
+				
+				//Create a asynchronous GET request
+				xmlhttp.open("POST", reqURL, true);
+				
+				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				
+				//When readyState is 4 then get the server output
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4) { 
+						if (xmlhttp.status == 200) 
+						{
+							$("#spinner").hide();
+							var obj = $.parseJSON(xmlhttp.responseText);
+							gauge.refresh(obj[0]);
+							
+							if(obj[4] == "-1") {
+								$('#slider').val(50);
+							} else {
+								$('#slider').val(obj[4]);
+								$("#submit-rating-btn").html('<i class="fa fa-star-o"></i> Update Rating');
+								$("#msg-tooltip").html(" Found previous rating for this site");
+								$("#msg-tooltip").fadeIn(800, function() {
+									setTimeout(function() {
+										$("#msg-tooltip").fadeOut(800);
+									}, 3000);
+								});							
+							}
+							
+							if (obj[5] != "") {
+								$("#comment-btn").html("<i class='fa fa-pencil'></i> Edit Comment");
+							}
+							$('#comment-textarea').html(obj[5]);
+							setTimeout(function() {
+								$('.circle.first').circleProgress({ value: obj[1]/100 });
+							}, 100);
+							setTimeout(function() {
+								$('.circle.second').circleProgress({ value: obj[2]/100 });
+							}, 200);
+							setTimeout(function() {
+								$('.circle.third').circleProgress({ value: obj[3]/100 });
+							}, 300);
+							for (var i=1; i<9; i++) {
+								$("#sq_checkbox" + i).val("None");
+								if(obj[5+i] == "Set") {
+									$("#label_checkbox" + i).click();
+								}
+							}
+							
+							$("#classifications").html(obj[14]);
+							$("#protocol").html(obj["siteScheme"]);
+							$("#siteurl").html(obj["siteUrl"]);
+							
+							for (var i=1; i<11; i++) {
+								var temp = ("comment_text_" + i)
+								if (temp in obj) {
+									$("#user_comments").append('<div class="comment" id="' + i + '"></div>');
+									$("#" + i + ".comment").append('<div class="comment_text"></div>');
+									$("#" + i + ".comment").append('<div class="comment_wrapper">');
+									var cmt = $("#" + i + ".comment").find(".comment_wrapper");
+									$("#" + i + ".comment").find(".comment_text").html(obj["comment_text_" + i]);									
+									cmt.append('<div class="comment_author"></div>');
+									cmt.append('<div class="comment_date"></div>');
+									cmt.find(".comment_author").html("Anonymous, ");
+									cmt.find(".comment_date").html(obj["comment_date_" + i]);
+								}
+							}
+							$("#user_comments").mCustomScrollbar({
+								theme: "dark-2",
+								setLeft: 0
+							});	
+						} else {
+							$(".gauge").hide();
+							$("#spinner").hide();
+							$("#gauge_error").show();
+							$(".circle.first").find('strong').text("--");
+							$(".circle.second").find('strong').text("--");
+							$(".circle.third").find('strong').text("--");
+							$("#description").html("<p>Unable to connect to the Aegis server. This may be a problem with the server or you might not be connected to the internet.</p>");
+							$("#classifications").html("");				
+						}
+					}
+				};
+				xmlhttp.send(params);
+			}
+			
+
+			
+		</script>
+	</head>
+	<body>
+		<input type="hidden" id="temp" value="">
+		<input type="hidden" id="pluginid" value="">
+		<div id="tab-div">
+			<div class="ionTabs" id="tabs_1" data-name="Tabs_Group_name">
+				<ul class="ionTabs__head">
+					<li class="ionTabs__tab" data-target="Summary">Summary</li>
+					<li class="ionTabs__tab" data-target="Details">Details</li>
+					<li class="ionTabs__tab" data-target="Settings">Settings</li>
+				</ul>
+				<div class="ionTabs__body">
+					<!--SUMMARY TAB-->
+					<div class="ionTabs__item" data-name="Summary">
+						<div class="area_left">
+							<h3>System Rating</h3>
+							<i id="spinner" style="position:absolute; left:149px;top:102px;z-index:99; font-size:1.75em" class="fa fa-refresh fa-spin"></i>
+							<div class="gauge" id="score_gauge"></div>
+							<div id="gauge_error" style="display:none">
+								<div class="alert alert-danger" role="alert"><i class="fa fa-exclamation-triangle"></i> Connection Error!</div>
+							</div>
+							<div id="circles">
+								<div class="first circle">
+									<strong></strong>
+									<p>User Rating</p>
+								</div>
+								<div class="second circle">
+									<strong></strong>
+									<p>Server Evaluation</p>
+								</div>
+								<div class="third circle">
+									<strong></strong>
+									<p>3rd Party Evaluation</p>
+								</div>
+							</div>
+							<div id="description">
+								<p></p>
+							</div>
+						</div>
+						<div class="area_right">
+							<h3>My Rating</h3>
+							<p>How much do you trust this website?</p>
+							<div id="slider"></div>
+							<div class="checkbox-div" id="category-1">
+								<div class="sq_checkbox left">
+									<h4>Good Site</h4>
+									<input type="checkbox" value="None" id="sq_checkbox1" name="check" hidden />
+									<label for="sq_checkbox1" id="label_checkbox1" onclick="toggle_checkbox($(this).prev('input'))"></label>
+								</div>
+								<div class="sq_checkbox right">
+									<h4>Ads/popups</h4>
+									<input type="checkbox" value="None" id="sq_checkbox2" name="check" hidden />
+									<label for="sq_checkbox2" id="label_checkbox2" onclick="toggle_checkbox($(this).prev('input'))"></label>
+								</div>
+								<div class="sq_checkbox left">
+									<h4>Privacy Risks</h4>
+									<input type="checkbox" value="None" id="sq_checkbox3" name="check" hidden />
+									<label for="sq_checkbox3" id="label_checkbox3" onclick="toggle_checkbox($(this).prev('input'))"></label>
+								</div>
+								<div class="sq_checkbox right">
+									<h4>Illegal Content</h4>
+									<input type="checkbox" value="None" id="sq_checkbox4" name="check" hidden />
+									<label for="sq_checkbox4" id="label_checkbox4" onclick="toggle_checkbox($(this).prev('input'))"></label>
+								</div>
+								<div class="sq_checkbox left">
+									<h4>Scam/Phishing</h4>
+									<input type="checkbox" value="None" id="sq_checkbox5" name="check" hidden />
+									<label for="sq_checkbox5" id="label_checkbox5" onclick="toggle_checkbox($(this).prev('input'))"></label>
+								</div>
+								<div class="sq_checkbox right">
+									<h4>Virus/Malware</h4>
+									<input type="checkbox" value="None" id="sq_checkbox6" name="check" hidden />
+									<label for="sq_checkbox6" id="label_checkbox6" onclick="toggle_checkbox($(this).prev('input'))"></label>
+								</div>
+								<div class="sq_checkbox left">
+									<h4>Adult Content</h4>
+									<input type="checkbox" value="None" id="sq_checkbox7" name="check" hidden />
+									<label for="sq_checkbox7" id="label_checkbox7" onclick="toggle_checkbox($(this).prev('input'))"></label>
+								</div>
+								<div class="sq_checkbox right">
+									<h4>Other</h4>
+									<input type="checkbox" value="None" id="sq_checkbox8" name="check" hidden />
+									<label for="sq_checkbox8" id="label_checkbox8" onclick="toggle_checkbox($(this).prev('input'))"></label>
+								</div>
+							</div>
+							<div id="comment-div">
+								<textarea id="comment-textarea" placeholder="Leave a comment..."></textarea>
+							</div>
+							<div id="tooltip-container">
+								<div id="msg-tooltip" class="alert alert-info" role="alert" style="display:none"><i class="fa fa-info-circle"></i></div>
+							</div>
+							<div class="button-div">
+								<button type="button" id="submit-rating-btn" class="btn btn-primary" onClick="ajaxAsyncPostRequest('http://localhost:8080/ajaxdemo/get-current-time', $('#temp').val())"><i class="fa fa-star-o"></i> Rate</button>
+								<button type="button" id="comment-btn" class="btn btn-default"><i class="fa fa-comment-o"></i> Comment</button>
+								<button type="button" id="save-comment-btn" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+								<button type="button" id="cancel-comment-btn" class="btn btn-default"><i class="fa fa-times"></i> Reset</button>
+							</div>
+						</div>
+					</div>
+					<!--DETALS TAB-->
+					<div class="ionTabs__item" data-name="Details">
+						<div class="area_left">
+							<h3>Details</h3>
+							<div id="details">
+								<p><b>URL: </b><span id="siteurl">www.google.com</span></p>
+								<p><b>Protocol: </b><span id="protocol"></span></p>
+								<p><b>SSL/TLS encrypted: </b>No</p>
+								<p><b>Last System Scan: </b>2015-02-20 11:19:55 CET</p>
+								<p><b>User classifications: </b><span id="classifications">N/A</span></p>
+								<p><b>More details 1: </b>Lorem ipsum dolor sit amet</p>
+								<p><b>More details 2: </b>Lorem ipsum dolor sit amet</p>
+								<p><b>More details 3: </b>Lorem ipsum dolor sit amet</p>
+							</div>
+						</div>
+						<div class="area_right">
+							<h3>User Comments</h3>
+							<div id="user_comments">
+							</div>
+						</div>
+					</div>
+					<!--SETTINGS TAB-->
+					<div class="ionTabs__item" data-name="Settings">
+						<div class="area_left">
+							WIP
+						</div>
+						<div class="area_right">
+						</div>
+					</div>
+
+					<div class="ionTabs__preloader"></div>
+				</div>
+			</div>
+		</div>
+		<footer>
+			<p>&copy; 2015 <a href="#" >Aegis</a></p>
+		</footer>
+	</body>
+</html>
