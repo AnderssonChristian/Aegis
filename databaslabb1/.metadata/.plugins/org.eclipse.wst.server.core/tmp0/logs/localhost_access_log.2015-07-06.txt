@@ -1,0 +1,13 @@
+127.0.0.1 - - [06/Jul/2015:15:57:50 +0200] "GET / HTTP/1.1" 404 951
+127.0.0.1 - - [06/Jul/2015:15:57:57 +0200] "POST /ajaxdemo/get-current-time HTTP/1.1" 500 1429
+127.0.0.1 - - [06/Jul/2015:15:57:59 +0200] "POST /ajaxdemo/trackvisits HTTP/1.1" 500 1491
+127.0.0.1 - - [06/Jul/2015:16:00:32 +0200] "GET / HTTP/1.1" 404 951
+127.0.0.1 - - [06/Jul/2015:16:00:44 +0200] "POST /ajaxdemo/trackvisits HTTP/1.1" 500 1931
+127.0.0.1 - - [06/Jul/2015:16:01:15 +0200] "GET / HTTP/1.1" 404 951
+127.0.0.1 - - [06/Jul/2015:16:01:15 +0200] "POST /ajaxdemo/get-current-time HTTP/1.1" 500 1429
+127.0.0.1 - - [06/Jul/2015:16:01:49 +0200] "GET / HTTP/1.1" 404 951
+127.0.0.1 - - [06/Jul/2015:16:01:50 +0200] "POST /ajaxdemo/trackvisits HTTP/1.1" 200 -
+127.0.0.1 - - [06/Jul/2015:16:01:54 +0200] "POST /ajaxdemo/get-current-time HTTP/1.1" 500 1429
+127.0.0.1 - - [06/Jul/2015:16:03:00 +0200] "GET / HTTP/1.1" 404 951
+127.0.0.1 - - [06/Jul/2015:16:03:01 +0200] "POST /ajaxdemo/trackvisits HTTP/1.1" 200 -
+127.0.0.1 - - [06/Jul/2015:16:03:02 +0200] "POST /ajaxdemo/get-current-time HTTP/1.1" 200 988

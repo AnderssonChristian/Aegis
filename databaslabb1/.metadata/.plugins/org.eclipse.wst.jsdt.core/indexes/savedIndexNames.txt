@@ -1,0 +1,6 @@
+INDEX VERSION 1.3+H:\aegis_git\Aegis\databaslabb1\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+611593533.index
+2539307242.index
+3465415271.index
+3785874639.index
+3169083919.index

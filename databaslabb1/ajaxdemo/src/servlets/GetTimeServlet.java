@@ -3,9 +3,6 @@ package servlets;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,8 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.common.net.InternetDomainName;
-
 public class GetTimeServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
@@ -24,7 +19,7 @@ public class GetTimeServlet extends HttpServlet {
 	int userrating = -1;
 	String[] chk = new String[8];
 	newtest.DbQueries dbq = new newtest.DbQueries();
-	newtest.Algorithms alg;
+	newtest.Algorithms alg = new newtest.Algorithms();
 
 	public void doPost (HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException 
 	{

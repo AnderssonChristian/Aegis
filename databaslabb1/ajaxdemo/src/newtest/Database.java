@@ -76,7 +76,7 @@ public class Database {
         
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
-            dom = db.parse("C:\\Users\\sam\\Documents\\aegisproject\\databaslabb1\\ajaxdemo\\src\\settings.xml");
+            dom = db.parse("H:\\aegis_git\\Aegis\\databaslabb1\\ajaxdemo\\src\\settings.xml");
 
             Element doc = dom.getDocumentElement();
 
