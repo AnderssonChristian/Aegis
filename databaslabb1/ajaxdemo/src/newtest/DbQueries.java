@@ -1,6 +1,7 @@
 package newtest;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DbQueries {
 	
@@ -330,5 +331,87 @@ public class DbQueries {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public ArrayList<String> getNoAlexaSites(){
+		PreparedStatement stmt;
+		ResultSet rs;
+		ArrayList<String> al = new ArrayList<String>();
+		try {
+			stmt = db.conn().prepareStatement("SELECT url FROM websites WHERE alexarank IS NULL");
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				al.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return al;
+	}
+	
+	public int updateSiteAlexa(int rank, String url){
+		int result = 0;
+		try {
+			PreparedStatement stmt = db.conn().prepareStatement("UPDATE websites SET alexarank = ? WHERE url = ?");
+			stmt.setInt(1, rank);
+			stmt.setString(2, url);
+			result = stmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	public ArrayList<String[]> getSitesToUpdate(){
+		PreparedStatement stmt;
+		ResultSet rs;
+		ArrayList<String[]> al = new ArrayList<String[]>();
+		try {
+			stmt = db.conn().prepareStatement("SELECT main.* " +
+												"FROM (" +
+													"SELECT " +
+														"w.url," +
+														"w.last_scanned," +
+														"w.alexarank," +
+															"TIMESTAMPDIFF(HOUR,w.last_scanned, NOW()) AS hrs_since_update " +
+														"FROM websites w" +
+														") main " +
+													"WHERE " +
+														"(CASE " + 
+															"WHEN alexarank >= 0 AND alexarank <= 50000 AND hrs_since_update >= 4320 THEN 1 " +
+															"WHEN alexarank >= 50001 AND alexarank <= 100000 AND hrs_since_update >= 2160 THEN 1 " +
+															"WHEN alexarank >= 100001 AND alexarank <= 500000 AND hrs_since_update >= 1080 THEN 1 " +
+															"WHEN alexarank >= 500001 AND alexarank <= 1000000 AND hrs_since_update >= 720 THEN 1 " +
+															"WHEN alexarank >= 1000001 AND alexarank <= 2000000 AND hrs_since_update >= 360 THEN 1 " +
+															"WHEN alexarank >= 2000001 AND alexarank <= 4000000 AND hrs_since_update >= 168 THEN 1 " +
+															"WHEN alexarank >= 4000001 AND alexarank <= 6000000 AND hrs_since_update >= 72 THEN 1 " +
+															"WHEN alexarank >= 6000001 AND hrs_since_update >= 24 THEN 1 " +
+															"ELSE 0 " + 
+														"END) = 1 ORDER BY hrs_since_update;");
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				String[] arr = new String[2];
+				arr[0] = rs.getString(1);
+				arr[1] = rs.getString(2);
+				al.add(arr);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return al;
+	}
+	
+	public int updateSiteCategories(String url, int cat_mal, int cat_phi, int cat_unw){
+		try {
+			PreparedStatement stmt = db.conn().prepareStatement("UPDATE websites SET cat_malware = ?, cat_phishing = ?, cat_unwanted = ?, last_scanned = CURRENT_TIMESTAMP WHERE url = ?");
+			stmt.setInt(1, cat_mal);
+			stmt.setInt(2, cat_phi);
+			stmt.setInt(3, cat_unw);
+			stmt.setString(4, url);
+			return stmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 }

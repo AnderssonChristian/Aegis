@@ -1,5 +1,7 @@
 package servlets;
 
+import java.util.ArrayList;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -11,6 +13,9 @@ public class ServletContext implements ServletContextListener{
     
     public void contextInitialized(ServletContextEvent contextEvent) {
     	//scheduler.googleSBScheduler();
+    	//scheduler.updateAlexaNewSites();
+    	ArrayList<String[]> al = scheduler.getSitesToUpdate();
+    	scheduler.updateScannedSites(al);
     }
     public void contextDestroyed(ServletContextEvent contextEvent) {
         System.out.println("Context Destroyed");
