@@ -45,8 +45,10 @@ public class Scheduler {
 	public void startScheduler() {
 		Runnable scheduleRunnable = new Runnable() {
 			public void run() {
+				System.out.println("yo");
 				updateAlexaNewSites();
 				ArrayList<String[]> al = getSitesToUpdate();
+				System.out.println(al.get(1));
 				updateScannedSites(al);
 			}
 		};
@@ -188,11 +190,14 @@ public class Scheduler {
     		urllist.add(url[0]);
     	}
 
-		return new_al = googleSBLookup(urllist);
+		new_al = googleSBLookup(urllist);
+		
+		return new_al;
 	}
 	
 	private void updateScannedSites(ArrayList<String[]> al){
 		for (String[] site : al) {
+			System.out.println(site[0] + " : " + site[1]);
 			switch (site[1]) {
             	case "ok":  dbq.updateSiteCategories(site[0], 0, 0, 0);
             		break;

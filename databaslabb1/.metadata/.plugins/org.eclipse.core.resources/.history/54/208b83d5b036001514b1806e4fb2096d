@@ -188,7 +188,9 @@ public class Scheduler {
     		urllist.add(url[0]);
     	}
 
-		return new_al = googleSBLookup(urllist);
+		new_al = googleSBLookup(urllist);
+		
+		return new_al;
 	}
 	
 	private void updateScannedSites(ArrayList<String[]> al){

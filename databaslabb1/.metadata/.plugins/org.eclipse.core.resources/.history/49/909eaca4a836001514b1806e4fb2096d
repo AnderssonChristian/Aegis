@@ -41,19 +41,8 @@ public class Scheduler {
 	public Scheduler(){
 		//do nothing
 	}
-	
-	public void startScheduler() {
-		Runnable scheduleRunnable = new Runnable() {
-			public void run() {
-				updateAlexaNewSites();
-				ArrayList<String[]> al = getSitesToUpdate();
-				updateScannedSites(al);
-			}
-		};
-		service.scheduleAtFixedRate(scheduleRunnable, 0, 20, TimeUnit.SECONDS);
-	}
 
-	/*public void phishtankScheduler() {
+	public void phishtankScheduler() {
 		Runnable ptRunnable = new Runnable() {
 			public void run() {
 				try {
@@ -77,9 +66,9 @@ public class Scheduler {
 			}
 		};	
 		service.scheduleAtFixedRate(ptRunnable, 0, 60, TimeUnit.MINUTES);
-	}*/
+	}
 	
-	private ArrayList<String[]> googleSBLookup(ArrayList<String> al) {
+	public ArrayList<String[]> googleSBScheduler(ArrayList<String> al) {
 		ArrayList<String[]> new_al = new ArrayList<String[]>();
 		try {
 			String baseURL="https://sb-ssl.google.com/safebrowsing/api/lookup";
@@ -118,13 +107,6 @@ public class Scheduler {
 				arr[1] = decodedString;
 			    new_al.add(arr);
 			    i++;
-			    al.remove(i);
-			}
-			for (String temp : al){
-				String[] arr = new String[2];
-				arr[0] = temp;
-				arr[1] = "ok";
-				new_al.add(arr);
 			}
 			in.close();
 			
@@ -137,7 +119,7 @@ public class Scheduler {
 	}
 	
 		
-	private int getAlexaRanking(String domain) {
+	public int getAlexaRanking(String domain) {
 		 
 		int result = 0;
  
@@ -170,7 +152,7 @@ public class Scheduler {
 		return result;
 	}
 	
-	private void updateAlexaNewSites(){
+	public void updateAlexaNewSites(){
 		int rank;
     	ArrayList<String> al = dbq.getNoAlexaSites();
     	for (String url : al){
@@ -179,7 +161,7 @@ public class Scheduler {
     	}
 	}
 	
-	private ArrayList<String[]> getSitesToUpdate(){
+	public ArrayList<String[]> getSitesToUpdate(){
 		ArrayList<String[]> al = dbq.getSitesToUpdate();
 		ArrayList<String> urllist = new ArrayList<String>();
 		ArrayList<String[]> new_al;
@@ -188,11 +170,18 @@ public class Scheduler {
     		urllist.add(url[0]);
     	}
 
-		return new_al = googleSBLookup(urllist);
+		new_al = googleSBScheduler(urllist);
+		
+		/*for (String[] url : new_al){
+			System.out.println(url[0] + " : " + url[1]);
+		}*/
+		
+		return new_al;
 	}
 	
-	private void updateScannedSites(ArrayList<String[]> al){
+	public void updateScannedSites(ArrayList<String[]> al){
 		for (String[] site : al) {
+			System.out.println(site[0] + " : " + site[1]);
 			switch (site[1]) {
             	case "ok":  dbq.updateSiteCategories(site[0], 0, 0, 0);
             		break;
