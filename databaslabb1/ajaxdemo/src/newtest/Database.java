@@ -6,10 +6,7 @@ import javax.xml.parsers.*;
 import org.xml.sax.*;
 import org.w3c.dom.*;
 
-/**
- * Database is a class that specifies the interface to the
- * movie database. Uses JDBC and the MySQL Connector/J driver.
- */
+
 
 public class Database {
     private Connection conn;        

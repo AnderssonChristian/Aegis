@@ -37,6 +37,7 @@ public class Scheduler {
 
 	ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
 	DbQueries dbq = new DbQueries();
+	Algorithms alg = new Algorithms();
 
 	public Scheduler(){
 		//do nothing
@@ -114,11 +115,11 @@ public class Scheduler {
 			int i = 0;
 			while ((decodedString = in.readLine()) != null) {
 				String[] arr = new String[2];
-				arr[0] = al.get(i);
+				arr[0] = al.get(0);
 				arr[1] = decodedString;
-			    new_al.add(arr);
+			    new_al.add(arr);  
+			    al.remove(0);
 			    i++;
-			    al.remove(i);
 			}
 			for (String temp : al){
 				String[] arr = new String[2];
@@ -192,23 +193,42 @@ public class Scheduler {
 	}
 	
 	private void updateScannedSites(ArrayList<String[]> al){
+		int alexarank;
+		double score3rd;
 		for (String[] site : al) {
+			alexarank = dbq.getAlexaRank(site[0]);
 			switch (site[1]) {
-            	case "ok":  dbq.updateSiteCategories(site[0], 0, 0, 0);
+            	case "ok":
+            		score3rd = alg.calc3rdScore(alexarank, false, false, false);
+            		dbq.updateSiteCategories(site[0], 0, 0, 0, score3rd);
             		break;
-            	case "malware":  dbq.updateSiteCategories(site[0], 1, 0, 0);
+            	case "malware":
+            		score3rd = alg.calc3rdScore(alexarank, true, false, false);
+            		dbq.updateSiteCategories(site[0], 1, 0, 0, score3rd);
             		break;
-            	case "unwanted":  dbq.updateSiteCategories(site[0], 0, 1, 0);
+            	case "unwanted":
+            		score3rd = alg.calc3rdScore(alexarank, false, true, false);
+            		dbq.updateSiteCategories(site[0], 0, 1, 0, score3rd);
             		break;
-            	case "phishing":  dbq.updateSiteCategories(site[0], 0, 0, 1);
+            	case "phishing":
+            		score3rd = alg.calc3rdScore(alexarank, false, false, true);
+            		dbq.updateSiteCategories(site[0], 0, 0, 1, score3rd);
             		break;
-            	case "malware,unwanted":  dbq.updateSiteCategories(site[0], 1, 1, 0);
+            	case "malware,unwanted":
+            		score3rd = alg.calc3rdScore(alexarank, true, true, false);
+            		dbq.updateSiteCategories(site[0], 1, 1, 0, score3rd);
             		break;
-            	case "phishing,malware":  dbq.updateSiteCategories(site[0], 1, 0, 1);
+            	case "phishing,malware":
+            		score3rd = alg.calc3rdScore(alexarank, true, false, true);
+            		dbq.updateSiteCategories(site[0], 1, 0, 1, score3rd);
             		break;
-            	case "phishing,unwanted":  dbq.updateSiteCategories(site[0], 0, 1, 1);
+            	case "phishing,unwanted":
+            		score3rd = alg.calc3rdScore(alexarank, false, true, true);
+            		dbq.updateSiteCategories(site[0], 0, 1, 1, score3rd);
             		break;
-            	case "phishing,malware,unwanted":  dbq.updateSiteCategories(site[0], 1, 1, 1);
+            	case "phishing,malware,unwanted":
+            		score3rd = alg.calc3rdScore(alexarank, true, true, true);
+            		dbq.updateSiteCategories(site[0], 1, 1, 1, score3rd);
             		break;
 			}
 		}

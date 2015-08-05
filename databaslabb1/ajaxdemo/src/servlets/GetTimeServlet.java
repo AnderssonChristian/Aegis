@@ -51,6 +51,8 @@ public class GetTimeServlet extends HttpServlet {
 		System.out.println("Request:" + req);
 		
 		int usr_id = dbq.getUserId(pluginId);
+		double[] arr = dbq.getSiteScore(site);
+		String userSiteRating[] = (dbq.getUserRating(usr_id, site));
 		
 		if(req.equals("1")) {
 			userrating = (int) Double.parseDouble(postarr[3].split("=")[1]);			
@@ -68,23 +70,30 @@ public class GetTimeServlet extends HttpServlet {
 				}
 			}
 
-			System.out.println(usr_id);
 			if (usr_id == -1) {
 				if(dbq.createUser(pluginId)) {
 					usr_id = dbq.getUserId(pluginId);
 				}
 			}
 			dbq.insertUserRating(usr_id, site, userrating, usercomment, chk);
+			alg.calcAlgorithms(arr[1], userrating, usr_id, site);
+			double new_usersite_score = alg.getFinalScore();
+			double[] site_divs = alg.getSiteDivs();
+			arr[1] = new_usersite_score;
+			dbq.updateSiteUserScore(site, new_usersite_score, site_divs[0], site_divs[1]);
+			double trust = alg.getTrust();
+			dbq.updateUserTrust(usr_id, trust);
+			
 		} else if (req.equals("2")) System.out.println("yes!");
 		
 		JSONObject JSONobj = new JSONObject();
-		double[] arr = dbq.getSiteScore(site);
-		String userSiteRating[] = (dbq.getUserRating(usr_id, site));
 		
 		if (!(arr == null)) {
+				String gaugeScore = Double.toString(Math.round(arr[1]*0.3)+(arr[3]*0.7));
 			try {
-				for (int i=0; i<4; i++) {				
-					JSONobj.put(Integer.toString(i), Math.round(arr[i])); //insert into JSON object user/server/3rd/overall score.
+				JSONobj.put(Integer.toString(0), gaugeScore);
+				for (int i=1; i<4; i++) {				
+					JSONobj.put(Integer.toString(i), Math.round(arr[i])); //insert into JSON object gauge/user/server/3rd score.
 				}
 				if (userSiteRating != null) { 
 					JSONobj.put(Integer.toString(4), userSiteRating[0]);
@@ -94,8 +103,7 @@ public class GetTimeServlet extends HttpServlet {
 							userSiteRating[i] = "Set";
 						} else {
 							userSiteRating[i] = "None";
-						}
-						
+						}						
 					}
 					JSONobj.put(Integer.toString(6), userSiteRating[2]);
 					JSONobj.put(Integer.toString(7), userSiteRating[3]);
@@ -139,13 +147,20 @@ public class GetTimeServlet extends HttpServlet {
 			} catch (JSONException e) {}
 		}
 		double[] siteCatPerc = dbq.getSiteCatPercent(site);
+		String[] gsbCat = dbq.getGSBClasses(site);
 		String[] classifications = {"Good Site", "Ads/Popups", "Privacy Risks", "Illegal Content", "Scam/Phishing", "Virus/Malware", "Adult Content", "Other"};
-		String class_result = "";
+		String[] gsb_class = {"Good Site", "Unwanted", "Malware", "Phishing"};
+		String class_result = "", gsb_result = "";
 		double class_other = 0;
 		try {
-			for (int i=0; i<7; i++) {
+			if (gsbCat[0] == "1") gsb_result += "Unwanted Software, ";
+			if (gsbCat[1] == "1") gsb_result += "Malware, ";
+			if (gsbCat[2] == "1") gsb_result += "Phishing";
+			
+			for (int i=0; i<7; i++) {				
 				if (siteCatPerc[i] >= 0.05){
 					class_result += classifications[i] + " (" + Math.round(siteCatPerc[i] * 100) + "%), ";
+					
 				} else {
 					class_other += siteCatPerc[i];
 				}
@@ -156,16 +171,21 @@ public class GetTimeServlet extends HttpServlet {
 			}
 			if (class_result != null && class_result.length() > 0) {
 				class_result = class_result.substring(0, class_result.length()-2);
-			}
-			System.out.println(class_result);			
+			} else class_result = "N/A";
+			if (gsb_result != null && gsb_result.length() > 0) {
+				gsb_result = gsb_result.substring(0, gsb_result.length()-2);
+			} else gsb_result = "N/A";			
 			JSONobj.put("14", class_result);
+			JSONobj.put("15", gsb_result);
 			
 			String res[][] = new String[10][2];
 			res = dbq.getSiteComments(site);
+			int j;
 			for (int i=0; i<10; i++) {
 				if (res[i][0] != null) {
-					JSONobj.put("comment_text_" + i, res[i][0]);
-					JSONobj.put("comment_date_" + i, res[i][1]);
+					j = i+1;
+					JSONobj.put("comment_text_" + j, res[i][0]);
+					JSONobj.put("comment_date_" + j, res[i][1]);
 				}
 			}
 			if (siteScheme.equals("http")) {

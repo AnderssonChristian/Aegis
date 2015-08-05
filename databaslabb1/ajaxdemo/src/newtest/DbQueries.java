@@ -23,6 +23,7 @@ public class DbQueries {
 			arr[1] = result.getDouble(2);
 			arr[2] = result.getDouble(3);
 			arr[3] = result.getDouble(4);
+			db.closeConnection();
 			return arr;
 		} catch (SQLException e) {
 			return null;
@@ -36,7 +37,9 @@ public class DbQueries {
 			stmt.setInt(1, userId);
 			result = stmt.executeQuery();
 			result.next();
-			return result.getDouble(1);
+			double res = result.getDouble(1);
+			db.closeConnection();
+			return res;
 		} catch (SQLException e) {
 			return -1.0;
 		}
@@ -49,7 +52,9 @@ public class DbQueries {
 			stmt.setInt(1, userId);
 			result = stmt.executeQuery();
 			result.next();
-			return result.getInt(1);
+			int res = result.getInt(1);
+			db.closeConnection();
+			return res;
 		} catch (SQLException e) {
 			return -1;
 		}
@@ -65,6 +70,7 @@ public class DbQueries {
 			result.next();
 			arr[0] = result.getDouble(1);
 			arr[1] = result.getDouble(2);
+			db.closeConnection();
 			return arr;
 		} catch (SQLException e) {
 			return null;
@@ -83,6 +89,23 @@ public class DbQueries {
 			stmt.setDouble(6, divisor);
 			stmt.setString(7, url);
 			result = stmt.executeUpdate();
+			db.closeConnection();
+			return result;
+		} catch (SQLException e) {
+			return -1;
+		}
+	}
+	
+	public int updateSiteUserScore(String url, double userscore, double divident, double divisor) {
+		int result = 0;
+		try {
+			PreparedStatement stmt = db.conn().prepareStatement("UPDATE websites SET user_score = ?, score_divident = ?, score_divisor = ? WHERE url = ?");
+			stmt.setDouble(1, userscore);
+			stmt.setDouble(2, divident);
+			stmt.setDouble(3, divisor);
+			stmt.setString(4, url);
+			result = stmt.executeUpdate();
+			db.closeConnection();
 			return result;
 		} catch (SQLException e) {
 			return -1;
@@ -96,6 +119,7 @@ public class DbQueries {
 			stmt.setDouble(1, trust);
 			stmt.setInt(2, userId);
 			result = stmt.executeUpdate();
+			db.closeConnection();
 			return result;
 		} catch (SQLException e) {
 			return -1;
@@ -109,7 +133,9 @@ public class DbQueries {
 			stmt.setString(1, pluginId);
 			result = stmt.executeQuery();
 			result.next();
-			return result.getInt(1);
+			int res = result.getInt(1);
+			db.closeConnection();
+			return res;
 		} catch (SQLException e) {
 			return -1;
 		}
@@ -121,6 +147,7 @@ public class DbQueries {
 			PreparedStatement stmt = db.conn().prepareStatement("INSERT INTO users (plugin_id) VALUES (?)");
 			stmt.setString(1, pluginId);
 			result = stmt.execute();
+			db.closeConnection();
 			return !result;
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -150,6 +177,7 @@ public class DbQueries {
 			} else {
 				return null;
 			}
+			db.closeConnection();
 			return arr;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -185,6 +213,7 @@ public class DbQueries {
 				}
 				stmt2.setString(12, url);
 				boolean res = stmt2.execute();
+				db.closeConnection();
 				if (res) return 1; else return 0;
 				
 			} else { //vote from this user on this site already exists -- update vote
@@ -198,6 +227,7 @@ public class DbQueries {
 				}
 				stmt4.setString(11, voteId);
 				result = stmt4.executeUpdate();
+				db.closeConnection();
 				return result;
 			}			
 		} catch (SQLException e) {
@@ -246,11 +276,13 @@ public class DbQueries {
 					res[i] = rs.getDouble(i+1)/total;
 				}
 			} else {
+				db.closeConnection();
 				return null;
 			}			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		db.closeConnection();
 		return res;
 	}
 	
@@ -273,6 +305,7 @@ public class DbQueries {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		db.closeConnection();
 		return result;
 	}
 	
@@ -284,11 +317,13 @@ public class DbQueries {
 			stmt.setString(1, url);
 			rs = stmt.executeQuery();
 			if (rs.next()) {
+				db.closeConnection();
 				return true;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		db.closeConnection();
 		return false;
 	}
 	
@@ -308,6 +343,7 @@ public class DbQueries {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		db.closeConnection();
 		return false;
 	}
 	
@@ -330,6 +366,7 @@ public class DbQueries {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		db.closeConnection();
 		return false;
 	}
 	
@@ -346,6 +383,7 @@ public class DbQueries {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		db.closeConnection();
 		return al;
 	}
 	
@@ -359,6 +397,7 @@ public class DbQueries {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		db.closeConnection();
 		return result;
 	}
 	
@@ -398,20 +437,59 @@ public class DbQueries {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		db.closeConnection();
 		return al;
 	}
 	
-	public int updateSiteCategories(String url, int cat_mal, int cat_phi, int cat_unw){
+	public int updateSiteCategories(String url, int cat_mal, int cat_phi, int cat_unw, double score3rd){
 		try {
-			PreparedStatement stmt = db.conn().prepareStatement("UPDATE websites SET cat_malware = ?, cat_phishing = ?, cat_unwanted = ?, last_scanned = CURRENT_TIMESTAMP WHERE url = ?");
+			PreparedStatement stmt = db.conn().prepareStatement("UPDATE websites SET cat_malware = ?, cat_phishing = ?, cat_unwanted = ?, 3rd_score = ?, last_scanned = CURRENT_TIMESTAMP WHERE url = ?");
 			stmt.setInt(1, cat_mal);
 			stmt.setInt(2, cat_phi);
 			stmt.setInt(3, cat_unw);
-			stmt.setString(4, url);
-			return stmt.executeUpdate();
+			stmt.setDouble(4, score3rd);
+			stmt.setString(5, url);
+			int result = stmt.executeUpdate();
+			db.closeConnection();
+			return result;
 		} catch(SQLException e) {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+	
+	public int getAlexaRank(String url) {
+		ResultSet result;
+		try {
+			PreparedStatement stmt = db.conn().prepareStatement("SELECT alexarank FROM websites WHERE url = ?");
+			stmt.setString(1, url);
+			result = stmt.executeQuery();
+			result.next();
+			int res = result.getInt(1);
+			db.closeConnection();
+			return res;
+		} catch (SQLException e) {
+			return -1;
+		}
+	}
+	
+	public String[] getGSBClasses(String url) {
+		ResultSet result;
+		String arr[] = new String[3];
+		try {
+			PreparedStatement stmt = db.conn().prepareStatement("SELECT cat_unwanted, cat_malware, cat_phishing FROM websites WHERE url = ?");
+			stmt.setString(1, url);
+			result = stmt.executeQuery();
+			while(result.next()) {
+				arr[0] = result.getString(1);
+				arr[1] = result.getString(2);
+				arr[2] = result.getString(3);
+			}
+			db.closeConnection();
+			return arr;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
